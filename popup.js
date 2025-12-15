@@ -128,14 +128,58 @@ startButton.addEventListener('click', async () => {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    await chrome.tabs.sendMessage(tab.id, {
-      action: 'startTyping',
-      settings: settings
-    });
+    if (!tab) {
+      throw new Error('No active tab found');
+    }
+
+    // Check if the page is a valid webpage
+    if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('edge://')) {
+      throw new Error('Cannot run on browser internal pages');
+    }
+
+    // Try to send message to content script
+    try {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'startTyping',
+        settings: settings
+      });
+    } catch (messageError) {
+      // Content script might not be loaded, try to inject it
+      console.log('Content script not loaded, attempting to inject...');
+
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js']
+        });
+
+        // Wait a bit for script to initialize
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Try sending message again
+        await chrome.tabs.sendMessage(tab.id, {
+          action: 'startTyping',
+          settings: settings
+        });
+      } catch (injectError) {
+        console.error('Failed to inject content script:', injectError);
+        throw new Error('Could not load extension on this page. Try refreshing the page.');
+      }
+    }
 
   } catch (error) {
     console.error('Error:', error);
-    showStatus('Error: Make sure you\'re on a valid webpage', 'error');
+    let errorMessage = 'Error: ';
+
+    if (error.message.includes('Cannot run on browser internal pages')) {
+      errorMessage += 'This extension cannot run on Chrome internal pages. Please navigate to a regular webpage.';
+    } else if (error.message.includes('Could not load')) {
+      errorMessage += 'Could not load on this page. Try refreshing the page (Ctrl+R or Cmd+R).';
+    } else {
+      errorMessage += error.message || 'Make sure you\'re on a valid webpage';
+    }
+
+    showStatus(errorMessage, 'error');
     startButton.disabled = false;
     stopButton.disabled = true;
   }
