@@ -13,23 +13,25 @@ A Chrome extension that simulates realistic human typing with variable speed, oc
 
 ## Installation
 
-### Method 1: Load Unpacked Extension (Development)
+### Method 1: Install from Chrome Web Store (Recommended)
+
+**Coming Soon!** Once published, you'll be able to install with one click from the Chrome Web Store.
+
+**Want to publish it yourself?** See [PUBLISHING.md](PUBLISHING.md) for complete instructions.
+
+### Method 2: Load Unpacked Extension (Development)
+
+Perfect for testing or personal use:
 
 1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" using the toggle in the top-right corner
-4. Click "Load unpacked"
-5. Select the folder containing the extension files
-6. The extension should now appear in your extensions list
+2. **(Optional)** Create icons: Open `create-icons.html` in your browser and download the icons
+3. Open Chrome and navigate to `chrome://extensions/`
+4. Enable "Developer mode" using the toggle in the top-right corner
+5. Click "Load unpacked"
+6. Select the folder containing the extension files
+7. The extension should now appear in your extensions list
 
-### Method 2: Create Extension Icons (Optional)
-
-For a complete experience, create icon files:
-- `icon16.png` (16x16 pixels)
-- `icon48.png` (48x48 pixels)
-- `icon128.png` (128x128 pixels)
-
-Place these in the extension directory. If you don't have icons, the extension will still work but may show a default icon.
+**Note:** The extension works without custom icons, but Chrome will show a default icon.
 
 ## Usage
 
