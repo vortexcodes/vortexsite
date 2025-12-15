@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human Typer - Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #667eea;
+    }
+    .test-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .contenteditable {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      box-sizing: border-box;
+    }
+    .contenteditable:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+    .instructions {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .instructions h3 {
+      margin-top: 0;
+      color: #1565c0;
+    }
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .instructions li {
+      margin: 8px 0;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #c7254e;
+    }
+    .debug-info {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      border-left: 4px solid #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Human Typer Test Page</h1>
+
+    <div class="instructions">
+      <h3>How to Test:</h3>
+      <ol>
+        <li>Click the <strong>Human Typer</strong> extension icon in your toolbar</li>
+        <li>Paste some text into the extension popup</li>
+        <li>Click <strong>"Start Typing"</strong></li>
+        <li>Click into one of the text fields below</li>
+        <li>Watch the text type automatically!</li>
+      </ol>
+    </div>
+
+    <div class="debug-info">
+      <strong>🔍 Debugging:</strong><br>
+      Press <code>F12</code> to open Chrome DevTools, then check the <strong>Console</strong> tab for debug messages starting with <code>[Human Typer]</code>
+    </div>
+
+    <div class="test-section">
+      <h3>Test 1: Text Input</h3>
+      <label>Regular Text Input:</label>
+      <input type="text" placeholder="Click here after clicking 'Start Typing'">
+    </div>
+
+    <div class="test-section">
+      <h3>Test 2: Textarea</h3>
+      <label>Textarea Field:</label>
+      <textarea placeholder="Click here after clicking 'Start Typing'"></textarea>
+    </div>
+
+    <div class="test-section">
+      <h3>Test 3: Email Input</h3>
+      <label>Email Input:</label>
+      <input type="email" placeholder="test@example.com">
+    </div>
+
+    <div class="test-section">
+      <h3>Test 4: Search Input</h3>
+      <label>Search Input:</label>
+      <input type="search" placeholder="Search...">
+    </div>
+
+    <div class="test-section">
+      <h3>Test 5: ContentEditable Div</h3>
+      <label>ContentEditable Element:</label>
+      <div class="contenteditable" contenteditable="true">Click here to start typing...</div>
+    </div>
+
+    <div class="test-section">
+      <h3>Test 6: Password Input</h3>
+      <label>Password Input (hidden typing):</label>
+      <input type="password" placeholder="Password">
+    </div>
+
+  </div>
+
+  <script>
+    // Add visual feedback when fields are focused
+    document.querySelectorAll('input, textarea, [contenteditable]').forEach(element => {
+      element.addEventListener('focus', () => {
+        console.log('Field focused:', element.tagName, element.type || 'contenteditable');
+      });
+    });
+  </script>
+</body>
+</html>

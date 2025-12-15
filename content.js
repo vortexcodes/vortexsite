@@ -240,24 +240,36 @@ async function startHumanTyping(element, text, settings) {
     // Send progress update
     const progress = Math.round((charIndex / chars.length) * 100);
     if (charIndex % 10 === 0) {
-      chrome.runtime.sendMessage({
-        action: 'typingProgress',
-        progress: progress
-      });
+      try {
+        chrome.runtime.sendMessage({
+          action: 'typingProgress',
+          progress: progress
+        });
+      } catch (e) {
+        // Popup might be closed, that's okay
+      }
     }
   }
 
   isTyping = false;
 
   if (shouldStop) {
-    chrome.runtime.sendMessage({
-      action: 'typingError',
-      error: 'Typing was stopped by user'
-    });
+    try {
+      chrome.runtime.sendMessage({
+        action: 'typingError',
+        error: 'Typing was stopped by user'
+      });
+    } catch (e) {
+      console.log('[Human Typer] Could not send stop message (popup may be closed)');
+    }
   } else {
-    chrome.runtime.sendMessage({
-      action: 'typingComplete'
-    });
+    try {
+      chrome.runtime.sendMessage({
+        action: 'typingComplete'
+      });
+    } catch (e) {
+      console.log('[Human Typer] Could not send completion message (popup may be closed)');
+    }
   }
 }
 
@@ -265,13 +277,49 @@ async function startHumanTyping(element, text, settings) {
 let waitingForFocus = false;
 let pendingSettings = null;
 
+// Check if element is a valid text input
+function isTextInput(element) {
+  if (!element) return false;
+
+  // Check for textarea
+  if (element.tagName === 'TEXTAREA') {
+    return true;
+  }
+
+  // Check for contenteditable
+  if (element.isContentEditable) {
+    return true;
+  }
+
+  // Check for text input types
+  if (element.tagName === 'INPUT') {
+    const type = (element.type || 'text').toLowerCase();
+    const validTypes = ['text', 'email', 'password', 'search', 'tel', 'url', 'number'];
+    return validTypes.includes(type);
+  }
+
+  return false;
+}
+
 function setupFocusListener() {
+  console.log('[Human Typer] Focus listener initialized');
+
   document.addEventListener('focus', async (e) => {
-    if (waitingForFocus && (
-      e.target.tagName === 'TEXTAREA' ||
-      e.target.tagName === 'INPUT' ||
-      e.target.isContentEditable
-    )) {
+    console.log('[Human Typer] Focus event detected on:', e.target.tagName, e.target.type);
+
+    if (waitingForFocus && isTextInput(e.target)) {
+      console.log('[Human Typer] Starting typing on element');
+      waitingForFocus = false;
+      await startHumanTyping(e.target, pendingSettings.text, pendingSettings);
+      pendingSettings = null;
+    }
+  }, true);
+
+  // Also listen for click events as backup
+  document.addEventListener('click', async (e) => {
+    if (waitingForFocus && isTextInput(e.target)) {
+      console.log('[Human Typer] Starting typing via click on element');
+      e.target.focus();
       waitingForFocus = false;
       await startHumanTyping(e.target, pendingSettings.text, pendingSettings);
       pendingSettings = null;
@@ -284,25 +332,32 @@ setupFocusListener();
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Human Typer] Message received:', message.action);
+
   if (message.action === 'startTyping') {
     typingSettings = message.settings;
     pendingSettings = message.settings;
     waitingForFocus = true;
 
+    console.log('[Human Typer] Waiting for focus on text field...');
+    console.log('[Human Typer] Text to type:', message.settings.text.substring(0, 50) + '...');
+
     // If there's already a focused element, start typing immediately
     const activeEl = document.activeElement;
-    if (activeEl && (
-      activeEl.tagName === 'TEXTAREA' ||
-      activeEl.tagName === 'INPUT' ||
-      activeEl.isContentEditable
-    )) {
+    console.log('[Human Typer] Currently focused element:', activeEl?.tagName, activeEl?.type);
+
+    if (activeEl && isTextInput(activeEl)) {
+      console.log('[Human Typer] Starting typing immediately on focused element');
       waitingForFocus = false;
       startHumanTyping(activeEl, message.settings.text, message.settings);
       pendingSettings = null;
+    } else {
+      console.log('[Human Typer] No valid text field focused. Click on a text field to start.');
     }
 
     sendResponse({ success: true });
   } else if (message.action === 'stopTyping') {
+    console.log('[Human Typer] Stopping typing');
     shouldStop = true;
     waitingForFocus = false;
     pendingSettings = null;
