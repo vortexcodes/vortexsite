@@ -72,14 +72,7 @@ function sleep(ms) {
 
 // Simulate typing a single character
 async function typeCharacter(element, char, isTypo = false) {
-  // Create and dispatch input events
-  const inputEvent = new InputEvent('input', {
-    bubbles: true,
-    cancelable: true,
-    inputType: 'insertText',
-    data: char
-  });
-
+  // Create keyboard events
   const keydownEvent = new KeyboardEvent('keydown', {
     bubbles: true,
     cancelable: true,
@@ -104,14 +97,56 @@ async function typeCharacter(element, char, isTypo = false) {
   element.dispatchEvent(keydownEvent);
   element.dispatchEvent(keypressEvent);
 
-  // Update the value
-  const start = element.selectionStart;
-  const end = element.selectionEnd;
-  const value = element.value;
-  element.value = value.substring(0, start) + char + value.substring(end);
-  element.selectionStart = element.selectionEnd = start + 1;
+  // Handle contentEditable elements differently
+  if (element.isContentEditable) {
+    try {
+      // For contentEditable, insert at cursor position
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) {
+        // No selection, just append to the end
+        element.textContent += char;
+      } else {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        const textNode = document.createTextNode(char);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
 
-  element.dispatchEvent(inputEvent);
+      // Trigger input event
+      const inputEvent = new InputEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        inputType: 'insertText',
+        data: char
+      });
+      element.dispatchEvent(inputEvent);
+    } catch (contentEditableError) {
+      console.warn('[Human Typer] ContentEditable typing error, falling back to simple append:', contentEditableError);
+      // Fallback: just append to the element
+      element.textContent += char;
+    }
+  } else {
+    // For input/textarea elements
+    const start = element.selectionStart || 0;
+    const end = element.selectionEnd || 0;
+    const value = element.value || '';
+    element.value = value.substring(0, start) + char + value.substring(end);
+    element.selectionStart = element.selectionEnd = start + 1;
+
+    // Trigger input event
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'insertText',
+      data: char
+    });
+    element.dispatchEvent(inputEvent);
+  }
+
   element.dispatchEvent(keyupEvent);
 
   // Trigger change event for frameworks
@@ -136,22 +171,42 @@ async function typeBackspace(element) {
 
   element.dispatchEvent(backspaceDown);
 
-  const start = element.selectionStart;
-  const end = element.selectionEnd;
-  const value = element.value;
+  // Handle contentEditable elements differently
+  if (element.isContentEditable) {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      if (range.collapsed && range.startOffset > 0) {
+        range.setStart(range.startContainer, range.startOffset - 1);
+        range.deleteContents();
+      }
+    }
 
-  if (start > 0) {
-    element.value = value.substring(0, start - 1) + value.substring(end);
-    element.selectionStart = element.selectionEnd = start - 1;
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'deleteContentBackward'
+    });
+    element.dispatchEvent(inputEvent);
+  } else {
+    // For input/textarea elements
+    const start = element.selectionStart || 0;
+    const end = element.selectionEnd || 0;
+    const value = element.value || '';
+
+    if (start > 0) {
+      element.value = value.substring(0, start - 1) + value.substring(end);
+      element.selectionStart = element.selectionEnd = start - 1;
+    }
+
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'deleteContentBackward'
+    });
+    element.dispatchEvent(inputEvent);
   }
 
-  const inputEvent = new InputEvent('input', {
-    bubbles: true,
-    cancelable: true,
-    inputType: 'deleteContentBackward'
-  });
-
-  element.dispatchEvent(inputEvent);
   element.dispatchEvent(backspaceUp);
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -170,32 +225,45 @@ function findCommonPrefix(str1, str2) {
 
 // Main typing function
 async function startHumanTyping(element, text, settings) {
-  isTyping = true;
-  shouldStop = false;
-  activeElement = element;
+  console.log('[Human Typer] Starting typing function');
+  console.log('[Human Typer] Element type:', element.tagName, 'ContentEditable:', element.isContentEditable);
+  console.log('[Human Typer] Text length:', text.length, 'Settings:', settings);
 
-  let textToType = text;
+  try {
+    isTyping = true;
+    shouldStop = false;
+    activeElement = element;
 
-  // Smart diff: check if highlighted text matches beginning of input
-  if (settings.smartDiff) {
-    const currentText = element.value;
-    const selectedText = currentText.substring(element.selectionStart, element.selectionEnd);
+    let textToType = text;
 
-    if (selectedText) {
-      // Find common prefix between selected text and new text
-      const commonLength = findCommonPrefix(selectedText, text);
+    // Smart diff: check if highlighted text matches beginning of input (only for input/textarea)
+    if (settings.smartDiff && !element.isContentEditable) {
+      try {
+        const currentText = element.value || '';
+        const start = element.selectionStart || 0;
+        const end = element.selectionEnd || 0;
+        const selectedText = currentText.substring(start, end);
 
-      if (commonLength > 0) {
-        // Only type the part that's different
-        textToType = text.substring(commonLength);
+        if (selectedText) {
+          // Find common prefix between selected text and new text
+          const commonLength = findCommonPrefix(selectedText, text);
 
-        // Move cursor to end of common prefix
-        const newStart = element.selectionStart + commonLength;
-        element.selectionStart = newStart;
-        element.selectionEnd = element.selectionEnd;
+          if (commonLength > 0) {
+            console.log('[Human Typer] Smart diff: skipping', commonLength, 'common characters');
+            // Only type the part that's different
+            textToType = text.substring(commonLength);
+
+            // Move cursor to end of common prefix
+            const newStart = start + commonLength;
+            element.selectionStart = newStart;
+            element.selectionEnd = end;
+          }
+        }
+      } catch (diffError) {
+        console.warn('[Human Typer] Smart diff failed, typing full text:', diffError);
+        // If smart diff fails, just type the full text
       }
     }
-  }
 
   const chars = textToType.split('');
   let charIndex = 0;
@@ -251,24 +319,40 @@ async function startHumanTyping(element, text, settings) {
     }
   }
 
-  isTyping = false;
+    isTyping = false;
 
-  if (shouldStop) {
+    if (shouldStop) {
+      console.log('[Human Typer] Typing stopped by user');
+      try {
+        chrome.runtime.sendMessage({
+          action: 'typingError',
+          error: 'Typing was stopped by user'
+        });
+      } catch (e) {
+        console.log('[Human Typer] Could not send stop message (popup may be closed)');
+      }
+    } else {
+      console.log('[Human Typer] Typing complete!');
+      try {
+        chrome.runtime.sendMessage({
+          action: 'typingComplete'
+        });
+      } catch (e) {
+        console.log('[Human Typer] Could not send completion message (popup may be closed)');
+      }
+    }
+  } catch (error) {
+    console.error('[Human Typer] Error during typing:', error);
+    isTyping = false;
+    shouldStop = false;
+
     try {
       chrome.runtime.sendMessage({
         action: 'typingError',
-        error: 'Typing was stopped by user'
+        error: error.message || 'An error occurred while typing'
       });
     } catch (e) {
-      console.log('[Human Typer] Could not send stop message (popup may be closed)');
-    }
-  } else {
-    try {
-      chrome.runtime.sendMessage({
-        action: 'typingComplete'
-      });
-    } catch (e) {
-      console.log('[Human Typer] Could not send completion message (popup may be closed)');
+      console.log('[Human Typer] Could not send error message (popup may be closed)');
     }
   }
 }
