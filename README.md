@@ -1,6 +1,11 @@
-# Human Typer - Chrome Extension
+# Human Typer - Browser Extension
 
-A Chrome extension that simulates realistic human typing with variable speed, occasional typos, and text humanization features.
+A browser extension that simulates realistic human typing with variable speed, occasional typos, and text humanization features.
+
+**Compatible with Chrome, Firefox, Edge, and other Chromium-based browsers!**
+
+- 🌐 [Chrome Installation](#installation) (see below)
+- 🦊 [Firefox Installation](FIREFOX.md) (see FIREFOX.md)
 
 ## Features
 

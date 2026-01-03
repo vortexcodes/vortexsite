@@ -24,11 +24,11 @@ if [ ! -f "icon16.png" ] || [ ! -f "icon48.png" ] || [ ! -f "icon128.png" ]; the
     fi
 
     # Create dummy manifest without icons for testing
-    FILES="manifest.json popup.html popup.js content.js styles.css"
+    FILES="manifest.json popup.html popup.js content.js styles.css browser-polyfill-lite.js"
     echo ""
     echo "⚠️  Creating package without icons..."
 else
-    FILES="manifest.json popup.html popup.js content.js styles.css icon16.png icon48.png icon128.png"
+    FILES="manifest.json popup.html popup.js content.js styles.css browser-polyfill-lite.js icon16.png icon48.png icon128.png"
     echo "✅ All icon files found!"
 fi
 
