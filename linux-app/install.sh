@@ -115,7 +115,7 @@ fi
 
 # Check if tkinter is installed
 echo ""
-echo "🔍 Checking for tkinter..."
+echo "🔍 Checking for tkinter (GUI framework)..."
 if ! python3 -c "import tkinter" 2>/dev/null; then
     echo "⚠️  tkinter not found, installing..."
     case $DISTRO in
@@ -148,6 +148,60 @@ if ! python3 -c "import tkinter" 2>/dev/null; then
 else
     echo "✅ tkinter is installed"
 fi
+
+# Install X11/system libraries required for pynput
+echo ""
+echo "🔍 Installing system libraries for keyboard simulation..."
+
+case $DISTRO in
+    ubuntu|debian)
+        echo "Installing X11 libraries for Ubuntu/Debian..."
+        $USE_SUDO apt install -y \
+            libx11-dev \
+            libxtst-dev \
+            libxcb1 \
+            python3-xlib \
+            x11-utils \
+            2>/dev/null || {
+            echo "⚠️  Some X11 libraries may not have installed"
+            echo "The app might still work, trying to continue..."
+        }
+        ;;
+    fedora)
+        echo "Installing X11 libraries for Fedora..."
+        $USE_SUDO dnf install -y \
+            libX11-devel \
+            libXtst-devel \
+            libxcb \
+            python3-xlib \
+            xorg-x11-utils \
+            2>/dev/null || {
+            echo "⚠️  Some X11 libraries may not have installed"
+            echo "The app might still work, trying to continue..."
+        }
+        ;;
+    arch|manjaro)
+        echo "Installing X11 libraries for Arch..."
+        $USE_SUDO pacman -S --noconfirm \
+            libx11 \
+            libxtst \
+            libxcb \
+            python-xlib \
+            xorg-xev \
+            2>/dev/null || {
+            echo "⚠️  Some X11 libraries may not have installed"
+            echo "The app might still work, trying to continue..."
+        }
+        ;;
+    *)
+        echo "⚠️  Unknown distribution, skipping X11 library installation"
+        echo "If pynput doesn't work, you may need to install:"
+        echo "  - X11 development libraries (libx11, libxtst)"
+        echo "  - python-xlib or python3-xlib"
+        ;;
+esac
+
+echo "✅ System libraries installation attempted"
 
 # Install Python dependencies
 echo ""

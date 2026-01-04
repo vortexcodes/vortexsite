@@ -26,6 +26,53 @@ A standalone desktop application for Linux that simulates realistic human typing
 - Arch Linux
 - Linux Mint
 - Pop!_OS
+- M1/M2 Mac running Fedora/Asahi Linux
+
+## Required Programs & Packages
+
+The app needs several programs installed. The installer handles this automatically, but if you want to install manually:
+
+### Quick Install All Dependencies
+
+**Ubuntu/Debian:**
+```bash
+sudo apt update && sudo apt install -y \
+    python3 python3-pip python3-tk \
+    libx11-dev libxtst-dev libxcb1 python3-xlib x11-utils
+pip3 install --user pynput
+```
+
+**Fedora:**
+```bash
+sudo dnf install -y \
+    python3 python3-pip python3-tkinter \
+    libX11-devel libXtst-devel libxcb python3-xlib xorg-x11-utils
+pip3 install --user pynput
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S --noconfirm \
+    python python-pip tk \
+    libx11 libxtst libxcb python-xlib xorg-xev
+pip3 install --user pynput
+```
+
+### What Each Package Does
+
+| Package | Purpose |
+|---------|---------|
+| **python3** | Programming language runtime |
+| **python3-pip** | Python package installer |
+| **python3-tk/tkinter** | GUI framework for the interface |
+| **libx11-dev/libX11-devel** | X11 development libraries |
+| **libxtst-dev/libXtst-devel** | X11 keyboard/mouse extension |
+| **libxcb** | X protocol library |
+| **python3-xlib** | Python X11 bindings |
+| **x11-utils/xorg-x11-utils** | X11 testing tools |
+| **pynput** | Python keyboard control library |
+
+**📖 For detailed information about each dependency, see [DEPENDENCIES.md](DEPENDENCIES.md)**
 
 ## Installation
 
