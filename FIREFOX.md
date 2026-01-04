@@ -8,15 +8,81 @@ This extension is fully compatible with Firefox! It works exactly the same as th
 
 Once published, you'll be able to install directly from addons.mozilla.org with one click.
 
+---
+
+## How to Create the Firefox Package (human-typer-firefox.zip)
+
+Before installing, you need to create the package file. Here's how:
+
+### Step 1: Open Terminal (Command Line)
+
+**On Linux:**
+- Press `Ctrl + Alt + T` (on most Linux systems)
+- Or search for "Terminal" in your applications menu
+
+**On Mac:**
+- Press `Cmd + Space` and type "Terminal"
+- Or go to Applications → Utilities → Terminal
+
+**On Windows (if you have Git Bash or WSL):**
+- Search for "Git Bash" or "Ubuntu" in Start menu
+
+### Step 2: Navigate to the Extension Folder
+
+The extension files are located at: `/home/user/vortexsite`
+
+In the terminal, type this command and press Enter:
+
+```bash
+cd /home/user/vortexsite
+```
+
+This changes your location to the folder containing the extension files.
+
+### Step 3: Run the Packaging Script
+
+Now type this command and press Enter:
+
+```bash
+./package-firefox.sh
+```
+
+**What this does:**
+- Creates a ZIP file containing all the extension files
+- Renames `manifest-firefox.json` to `manifest.json` (Firefox requirement)
+- Puts everything into `human-typer-firefox.zip`
+
+**What you'll see:**
+```
+📦 Packaging Human Typer for Firefox Add-ons...
+
+✅ All icon files found!
+
+Creating Firefox package...
+✅ Firefox package created successfully: human-typer-firefox.zip
+
+File size: 15K
+```
+
+### Step 4: Find Your Package File
+
+The `human-typer-firefox.zip` file is now in `/home/user/vortexsite/`
+
+**To find it:**
+- Open your file manager (Nautilus, Dolphin, Finder, etc.)
+- Navigate to `/home/user/vortexsite/`
+- Look for `human-typer-firefox.zip`
+
+You'll use this file in the next steps!
+
+---
+
 ### Option 2: Load Temporarily (Testing/Development) - EASIEST METHOD
 
 Perfect for testing the extension immediately:
 
-1. **Create the Firefox package:**
-   ```bash
-   ./package-firefox.sh
-   ```
-   This creates `human-typer-firefox.zip` in the current folder.
+1. **Create the Firefox package** (see instructions above)
+   - You should now have `human-typer-firefox.zip` in `/home/user/vortexsite/`
 
 2. **Open Firefox's special debugging page:**
    - Look at the **top of your Firefox window** where you normally type website addresses (google.com, etc.)
@@ -70,11 +136,9 @@ For permanent installation during development (extension stays even after closin
    - Click the **toggle button** on the right (or double-click the setting)
    - It should change from `true` to `false`
 
-5. **Create the Firefox package:**
-   ```bash
-   ./package-firefox.sh
-   ```
-   This creates `human-typer-firefox.zip` in the current folder.
+5. **Create the Firefox package** (if you haven't already)
+   - See the "How to Create the Firefox Package" section above
+   - You should have `human-typer-firefox.zip` in `/home/user/vortexsite/`
 
 6. **Install the extension:**
    - **Drag and drop** `human-typer-firefox.zip` from your file manager into any Firefox window
