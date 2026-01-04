@@ -8,7 +8,7 @@ This extension is fully compatible with Firefox! It works exactly the same as th
 
 Once published, you'll be able to install directly from addons.mozilla.org with one click.
 
-### Option 2: Load Temporarily (Testing/Development)
+### Option 2: Load Temporarily (Testing/Development) - EASIEST METHOD
 
 Perfect for testing the extension immediately:
 
@@ -16,49 +16,77 @@ Perfect for testing the extension immediately:
    ```bash
    ./package-firefox.sh
    ```
+   This creates `human-typer-firefox.zip` in the current folder.
 
-2. **Open Firefox and navigate to:**
+2. **Open Firefox's special debugging page:**
+   - Look at the **top of your Firefox window** where you normally type website addresses (google.com, etc.)
+   - That bar is called the "address bar"
+   - **Click in the address bar** and paste this EXACTLY:
    ```
    about:debugging#/runtime/this-firefox
    ```
+   - Press **Enter**
+   - You should see a page titled "This Firefox" with debugging options
 
-3. **Click "Load Temporary Add-on..."**
+3. **Click the blue "Load Temporary Add-on..." button**
+   - It's near the top of the page
 
-4. **Select the file:**
-   - Navigate to the extension folder
+4. **Select the extension file:**
+   - A file picker will open
+   - Navigate to your extension folder (where you ran the package script)
    - Select `human-typer-firefox.zip`
-   - Or select any file from the extension folder (like `manifest-firefox.json`)
+   - Click "Open"
 
-5. **The extension is now loaded!** (It will stay until you close Firefox)
+5. **The extension is now loaded!**
+   - You'll see it in the list with the name "Human Typer"
+   - **Note:** It will be removed when you close Firefox (that's why it's called "temporary")
+   - Just repeat these steps each time you open Firefox if you want to use it again
 
-### Option 3: Load Unpacked (Permanent)
+### Option 3: Load Unpacked (Permanent) - ADVANCED
 
-For permanent installation during development:
+For permanent installation during development (extension stays even after closing Firefox):
 
-1. **Open Firefox and navigate to:**
+1. **Open Firefox's advanced settings page:**
+   - Click in Firefox's **address bar** (top of window where you type website URLs)
+   - Paste this EXACTLY:
    ```
    about:config
    ```
+   - Press **Enter**
 
 2. **Accept the warning**
+   - Firefox will show a warning saying "Proceed with Caution"
+   - Click "Accept the Risk and Continue"
 
-3. **Search for:**
+3. **Find the signature setting:**
+   - You'll see a search box at the top
+   - Type or paste this:
    ```
    xpinstall.signatures.required
    ```
+   - You should see one result appear
 
-4. **Set it to `false`** (double-click)
+4. **Disable signature checking:**
+   - Click the **toggle button** on the right (or double-click the setting)
+   - It should change from `true` to `false`
 
-5. **Create the XPI package:**
+5. **Create the Firefox package:**
    ```bash
    ./package-firefox.sh
    ```
+   This creates `human-typer-firefox.zip` in the current folder.
 
-6. **Drag and drop** `human-typer-firefox.zip` into Firefox
+6. **Install the extension:**
+   - **Drag and drop** `human-typer-firefox.zip` from your file manager into any Firefox window
+   - OR: Click File → Open File and select `human-typer-firefox.zip`
 
-7. **Click "Add"** when prompted
+7. **Confirm installation:**
+   - Firefox will show a popup asking "Add Human Typer?"
+   - Click **"Add"**
 
-**Note:** This method requires disabling signature verification, which is only recommended for development.
+8. **Done!** The extension will now stay permanently until you manually remove it.
+
+**⚠️ Important Note:** This method disables Firefox's security feature that checks if extensions are signed by Mozilla. Only use this for your own development/testing. For regular use, publish to Firefox Add-ons instead.
 
 ## Publishing to Firefox Add-ons
 
