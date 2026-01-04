@@ -1,11 +1,30 @@
-# Human Typer - Browser Extension
+# Human Typer
 
-A browser extension that simulates realistic human typing with variable speed, occasional typos, and text humanization features.
+Simulate realistic human typing with variable speed, occasional typos, and text humanization features.
 
-**Compatible with Chrome, Firefox, Edge, and other Chromium-based browsers!**
+## Available Versions
 
-- 🌐 [Chrome Installation](#installation) (see below)
-- 🦊 [Firefox Installation](FIREFOX.md) (see FIREFOX.md)
+**🌐 Browser Extension** (Chrome, Firefox, Edge)
+- Works in all web browsers
+- No installation required (from store)
+- Perfect for web forms and online applications
+- [Chrome Installation](#installation) (see below)
+- [Firefox Installation](FIREFOX.md)
+
+**🐧 Linux Desktop App** (System-Wide)
+- Works in **ANY application** on Linux
+- Text editors, terminals, IDEs, browsers, everything!
+- Standalone Python application
+- [Linux App Installation](linux-app/README.md)
+
+Choose the version that fits your needs:
+- **Browser only?** → Use the browser extension
+- **Need system-wide typing on Linux?** → Use the desktop app
+- **Both?** → Install both!
+
+---
+
+## Browser Extension
 
 ## Features
 
